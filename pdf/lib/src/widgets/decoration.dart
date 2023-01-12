@@ -254,39 +254,52 @@ class BoxShadow {
 
   im.Image _rect(double width, double height) {
     final shadow = im.Image(
-      (width + spreadRadius * 2).round(),
-      (height + spreadRadius * 2).round(),
+      width: (width + spreadRadius * 2).round(),
+      height: (height + spreadRadius * 2).round(),
     );
 
     im.fillRect(
       shadow,
-      spreadRadius.round(),
-      spreadRadius.round(),
-      (spreadRadius + width).round(),
-      (spreadRadius + height).round(),
-      color.toInt(),
+      x1: spreadRadius.round(),
+      y1: spreadRadius.round(),
+      x2: (spreadRadius + width).round(),
+      y2: (spreadRadius + height).round(),
+      color: im.ColorRgba8(
+        color.red.toInt(),
+        color.green.toInt(),
+        color.blue.toInt(),
+        color.alpha.toInt(),
+      ),
     );
 
-    im.gaussianBlur(shadow, blurRadius.round());
+    im.gaussianBlur(
+      shadow,
+      radius: blurRadius.round(),
+    );
 
     return shadow;
   }
 
   im.Image _ellipse(double width, double height) {
     final shadow = im.Image(
-      (width + spreadRadius * 2).round(),
-      (height + spreadRadius * 2).round(),
+      width: (width + spreadRadius * 2).round(),
+      height: (height + spreadRadius * 2).round(),
     );
 
     im.fillCircle(
       shadow,
-      (spreadRadius + width / 2).round(),
-      (spreadRadius + height / 2).round(),
-      (width / 2).round(),
-      color.toInt(),
+      x: (spreadRadius + width / 2).round(),
+      y: (spreadRadius + height / 2).round(),
+      radius: (width / 2).round(),
+      color: im.ColorRgba8(
+        color.red.toInt(),
+        color.green.toInt(),
+        color.blue.toInt(),
+        color.alpha.toInt(),
+      ),
     );
 
-    im.gaussianBlur(shadow, blurRadius.round());
+    im.gaussianBlur(shadow, radius: blurRadius.round());
 
     return shadow;
   }

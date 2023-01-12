@@ -64,7 +64,11 @@ class PdfRaster {
 
   /// Returns the image as an [Image] object from the pub:image library
   im.Image asImage() {
-    return im.Image.fromBytes(width, height, pixels);
+    return im.Image.fromBytes(
+      width: width,
+      height: height,
+      bytes: ByteData.sublistView(pixels).buffer,
+    );
   }
 }
 

@@ -154,10 +154,10 @@ class PdfImage extends PdfXObject {
   }) {
     return PdfImage(
       pdfDocument,
-      image: image.getBytes(format: im.Format.rgba),
+      image: image.getBytes(order: im.ChannelOrder.rgba),
       width: image.width,
       height: image.height,
-      alpha: image.channels == im.Channels.rgba,
+      alpha: image.hasAlpha,
       orientation: orientation,
     );
   }
