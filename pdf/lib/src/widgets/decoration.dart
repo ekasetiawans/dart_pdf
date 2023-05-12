@@ -16,7 +16,6 @@
 
 import 'dart:math' as math;
 
-import 'package:image/image.dart' as im;
 import 'package:meta/meta.dart';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -251,58 +250,6 @@ class BoxShadow {
   final PdfPoint offset;
   final double blurRadius;
   final double spreadRadius;
-
-  im.Image _rect(double width, double height) {
-    final shadow = im.Image(
-      width: (width + spreadRadius * 2).round(),
-      height: (height + spreadRadius * 2).round(),
-    );
-
-    im.fillRect(
-      shadow,
-      x1: spreadRadius.round(),
-      y1: spreadRadius.round(),
-      x2: (spreadRadius + width).round(),
-      y2: (spreadRadius + height).round(),
-      color: im.ColorRgba8(
-        color.red.toInt(),
-        color.green.toInt(),
-        color.blue.toInt(),
-        color.alpha.toInt(),
-      ),
-    );
-
-    im.gaussianBlur(
-      shadow,
-      radius: blurRadius.round(),
-    );
-
-    return shadow;
-  }
-
-  im.Image _ellipse(double width, double height) {
-    final shadow = im.Image(
-      width: (width + spreadRadius * 2).round(),
-      height: (height + spreadRadius * 2).round(),
-    );
-
-    im.fillCircle(
-      shadow,
-      x: (spreadRadius + width / 2).round(),
-      y: (spreadRadius + height / 2).round(),
-      radius: (width / 2).round(),
-      color: im.ColorRgba8(
-        color.red.toInt(),
-        color.green.toInt(),
-        color.blue.toInt(),
-        color.alpha.toInt(),
-      ),
-    );
-
-    im.gaussianBlur(shadow, radius: blurRadius.round());
-
-    return shadow;
-  }
 }
 
 enum BoxShape { circle, rectangle }
@@ -342,7 +289,8 @@ class BoxDecoration {
             if (borderRadius == null) {
               if (boxShadow != null) {
                 for (final s in boxShadow!) {
-                  final i = s._rect(box.width, box.height);
+                  final i = PdfRasterBase.shadowRect(box.width, box.height,
+                      s.spreadRadius, s.blurRadius, s.color);
                   final m = PdfImage.fromImage(context.document, image: i);
                   context.canvas.drawImage(
                     m,
@@ -355,7 +303,8 @@ class BoxDecoration {
             } else {
               if (boxShadow != null) {
                 for (final s in boxShadow!) {
-                  final i = s._rect(box.width, box.height);
+                  final i = PdfRasterBase.shadowRect(box.width, box.height,
+                      s.spreadRadius, s.blurRadius, s.color);
                   final m = PdfImage.fromImage(context.document, image: i);
                   context.canvas.drawImage(
                     m,
@@ -370,7 +319,8 @@ class BoxDecoration {
           case BoxShape.circle:
             if (boxShadow != null && box.width == box.height) {
               for (final s in boxShadow!) {
-                final i = s._ellipse(box.width, box.height);
+                final i = PdfRasterBase.shadowEllipse(box.width, box.height,
+                    s.spreadRadius, s.blurRadius, s.color);
                 final m = PdfImage.fromImage(context.document, image: i);
                 context.canvas.drawImage(
                   m,

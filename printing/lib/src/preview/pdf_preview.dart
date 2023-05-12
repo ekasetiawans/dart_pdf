@@ -228,10 +228,10 @@ class PdfPreview extends StatefulWidget {
   final CustomPdfPagesBuilder? _pagesBuilder;
 
   @override
-  _PdfPreviewState createState() => _PdfPreviewState();
+  PdfPreviewState createState() => PdfPreviewState();
 }
 
-class _PdfPreviewState extends State<PdfPreview> {
+class PdfPreviewState extends State<PdfPreview> {
   final previewWidget = GlobalKey<PdfPreviewCustomState>();
   late PdfPreviewData previewData;
 
@@ -305,9 +305,12 @@ class _PdfPreviewState extends State<PdfPreview> {
   void didChangeDependencies() {
     if (!infoLoaded) {
       infoLoaded = true;
-      Printing.info().then((PrintingInfo _info) {
+      Printing.info().then((PrintingInfo printingInfo) {
+        if (!mounted) {
+          return;
+        }
         setState(() {
-          info = _info;
+          info = printingInfo;
         });
       });
     }
@@ -346,11 +349,11 @@ class _PdfPreviewState extends State<PdfPreview> {
       actions.add(PdfPageFormatAction(
         pageFormats: widget.pageFormats,
       ));
+    }
 
-      if (widget.useActions && widget.canChangeOrientation) {
-        // ignore: prefer_const_constructors
-        actions.add(PdfPageOrientationAction());
-      }
+    if (widget.useActions && widget.canChangeOrientation) {
+      // ignore: prefer_const_constructors
+      actions.add(PdfPageOrientationAction());
     }
 
     widget.actions?.forEach(actions.add);

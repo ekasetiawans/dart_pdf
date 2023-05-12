@@ -1,10 +1,55 @@
 # Changelog
 
-## 3.8.5
+## 3.10.3
+
+- Set xml 6.3.0 as minimum dependency
+
+## 3.10.2
+
+- Fix Type1 font widths
+- Deprecate PdfArrayObject and PdfObjectDict
+- Improve PdfArray and PdfDict constructors
+- Fix underline on spans [RomanIvn]
+- Improve verbose output
+- Allow saving an unmodified document
+- Table cell: dynamic widget [Shahriyar Aghajani]
+- Move Table.fromTextArray to TableHelper.fromTextArray
+- Fix PdfImage constructor without alpha channel [Tomasz Gucio]
+- image.fromBytes() pass bytes offset [Aravindhan K]
+- Update xml dependency and deprecated getter
+
+## 3.10.1
+
+- Fix web debug build
+
+## 3.10.0
+
+- Apply BoxShape and BorderRadius to selected Checkbox [Joseph Grabinger]
+- Fix Color.toHex()
+- Improve Annotations placement
+- Improve documentation strings
+- Improve verbose output
+- Import already defined form
+- Add support for deleted objects
+- Draw page content only if not empty
+- Fix Page Content
+- Reorganize data types
+- Improve Documents conformity
+- Make PdfXref a PdfIndirect descendent
+- Move Pdf generation settings to PdfSettings
+- Improve PdfXrefTable output
+
+## 3.9.0
 
 - Improve TTF Writer compatibility
 - Apply THE BIDIRECTIONAL ALGORITHM using dart_bidi [Milad akarie]
 - Add Inseparable Widget
+- Fix unit tests
+- Update Image dependency
+- Fix lints
+- Add options to customise border in Dataset widget [838]
+- Add Choice Field [Carsten Fregin]
+- Add Flutter 3.7 compatibility
 
 ## 3.8.4
 

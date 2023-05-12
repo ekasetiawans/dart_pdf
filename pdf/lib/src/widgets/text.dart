@@ -49,11 +49,13 @@ enum TextOverflow {
 }
 
 abstract class _Span {
-  _Span(this.style);
+  _Span(this.style, this.realWidth);
 
   final TextStyle style;
 
   var offset = PdfPoint.zero;
+
+  double realWidth;
 
   double get left;
 
@@ -103,9 +105,13 @@ class _TextDecoration {
       return _box;
     }
 
-    final x1 = spans[startSpan].offset.x + spans[startSpan].left;
-    final x2 =
-        spans[endSpan].offset.x + spans[endSpan].left + spans[endSpan].width;
+    final x1 = spans[startSpan].offset.x +
+        spans[startSpan].left +
+        spans[startSpan].realWidth;
+    final x2 = spans[endSpan].offset.x +
+        spans[endSpan].left +
+        spans[endSpan].width -
+        spans[endSpan].realWidth;
     var y1 = spans[startSpan].offset.y + spans[startSpan].top;
     var y2 = y1 + spans[startSpan].height;
 
@@ -178,11 +184,13 @@ class _TextDecoration {
 
     if (style.decoration!.contains(TextDecoration.underline)) {
       final base = -font.descent * style.fontSize! * textScaleFactor / 2;
-
+      final l = box!.left;
+      final r = box.right;
+      final x = globalBox!.x;
       context.canvas.drawLine(
-        globalBox!.x + box!.left,
+        x + l,
         globalBox.top + box.bottom + base,
-        globalBox.x + box.right,
+        x + r,
         globalBox.top + box.bottom + base,
       );
       if (style.decorationStyle == TextDecorationStyle.double) {
@@ -257,7 +265,7 @@ class _Word extends _Span {
     this.text,
     TextStyle style,
     this.metrics,
-  ) : super(style);
+  ) : super(style, metrics.advanceWidth);
 
   final String text;
 
@@ -323,7 +331,7 @@ class _Word extends _Span {
 }
 
 class _WidgetSpan extends _Span {
-  _WidgetSpan(this.widget, TextStyle style, this.baseline) : super(style);
+  _WidgetSpan(this.widget, TextStyle style, this.baseline) : super(style, 0);
 
   final Widget widget;
 
@@ -393,7 +401,7 @@ class _WidgetSpan extends _Span {
   }
 }
 
-typedef _VisitorCallback = bool Function(
+typedef VisitorCallback = bool Function(
   InlineSpan span,
   TextStyle? parentStyle,
   AnnotationBuilder? annotation,
@@ -435,7 +443,7 @@ abstract class InlineSpan {
   }
 
   bool visitChildren(
-    _VisitorCallback visitor,
+    VisitorCallback visitor,
     TextStyle? parentStyle,
     AnnotationBuilder? annotation,
   );
@@ -469,7 +477,7 @@ class WidgetSpan extends InlineSpan {
   /// Calls `visitor` on this [WidgetSpan]. There are no children spans to walk.
   @override
   bool visitChildren(
-    _VisitorCallback visitor,
+    VisitorCallback visitor,
     TextStyle? parentStyle,
     AnnotationBuilder? annotation,
   ) {
@@ -509,7 +517,7 @@ class TextSpan extends InlineSpan {
 
   @override
   bool visitChildren(
-    _VisitorCallback visitor,
+    VisitorCallback visitor,
     TextStyle? parentStyle,
     AnnotationBuilder? annotation,
   ) {
@@ -624,14 +632,14 @@ class _Line {
   }
 }
 
-class _RichTextContext extends WidgetContext {
+class RichTextContext extends WidgetContext {
   var startOffset = 0.0;
   var endOffset = 0.0;
   var spanStart = 0;
   var spanEnd = 0;
 
   @override
-  void apply(_RichTextContext other) {
+  void apply(RichTextContext other) {
     startOffset = other.startOffset;
     endOffset = other.endOffset;
     spanStart = other.spanStart;
@@ -640,7 +648,7 @@ class _RichTextContext extends WidgetContext {
 
   @override
   WidgetContext clone() {
-    return _RichTextContext()..apply(this);
+    return RichTextContext()..apply(this);
   }
 
   @override
@@ -682,7 +690,7 @@ class RichText extends Widget with SpanningWidget {
 
   final List<_TextDecoration> _decorations = <_TextDecoration>[];
 
-  final _context = _RichTextContext();
+  final _context = RichTextContext();
 
   final TextOverflow? overflow;
 
@@ -1297,7 +1305,7 @@ class RichText extends Widget with SpanningWidget {
   bool get hasMoreWidgets => canSpan;
 
   @override
-  void restoreContext(_RichTextContext context) {
+  void restoreContext(RichTextContext context) {
     _context.spanStart = context.spanEnd;
     _context.startOffset = -context.endOffset;
   }

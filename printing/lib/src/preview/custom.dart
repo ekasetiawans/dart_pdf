@@ -24,6 +24,7 @@ import '../printing.dart';
 import '../printing_info.dart';
 import 'page.dart';
 import 'raster.dart';
+
 /// Custom widget builder that's used for custom
 /// rasterized pdf pages rendering
 typedef CustomPdfPagesBuilder = Widget Function(
@@ -156,9 +157,12 @@ class PdfPreviewCustomState extends State<PdfPreviewCustom>
   void didChangeDependencies() {
     if (!infoLoaded) {
       infoLoaded = true;
-      Printing.info().then((PrintingInfo _info) {
+      Printing.info().then((PrintingInfo printingInfo) {
+        if (!mounted) {
+          return;
+        }
         setState(() {
-          info = _info;
+          info = printingInfo;
           raster();
         });
       });
@@ -181,8 +185,8 @@ class PdfPreviewCustomState extends State<PdfPreviewCustom>
       return _showError(error!);
     }
 
-    final _info = info;
-    if (_info != null && !_info.canRaster) {
+    final printingInfo = info;
+    if (printingInfo != null && !printingInfo.canRaster) {
       return _showError(_errorMessage);
     }
 
